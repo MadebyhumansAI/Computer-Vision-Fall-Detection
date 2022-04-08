@@ -83,7 +83,7 @@ def prepare_for_qat(model):
     # Specify which layers to fuse for better quantization results
     # You might need to extend this list depending on the exact YOLOv5 structure
     # This is just a basic example
-    fuse_list = [['conv', 'bn'], ['conv', 'bn', 'relu']]
+    fuse_list = [['bn'], ['bn', 'relu']]
     model = fuse_modules(model, fuse_list, inplace=True)
 
     qconfig = torch.quantization.get_default_qconfig('fbgemm')
@@ -136,7 +136,7 @@ def compute_yolo_loss(outputs, targets, anchors, num_classes, image_size=640):
 
 def train_qat(model, train_loader, num_epochs=5):
     """Train the YOLOv5 model with Quantization-Aware Training."""
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = optim.Adam(model.parameters(), lr=0.001) 
     
     for epoch in range(num_epochs):
         model.train()
