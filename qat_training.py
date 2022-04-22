@@ -9,6 +9,8 @@ import torchvision.transforms as transforms
 import torch
 from pathlib import Path
 
+from torch.quantization import get_default_qconfig, prepare_qat
+
 def load_yolo_model(model_name='yolov5s', pretrained=True):
     """Load a YOLOv5 model using Ultralytics implementation.
 
@@ -79,17 +81,10 @@ def prepare_data():
     return train_loader, test_loader
 
 def prepare_for_qat(model):
-    """Prepare the YOLOv5 model for Quantization-Aware Training."""
-    # Specify which layers to fuse for better quantization results
-    # You might need to extend this list depending on the exact YOLOv5 structure
-    # This is just a basic example
-    fuse_list = [['conv', 'bn'], ['conv', 'bn', 'relu']]
-    model = fuse_modules(model, fuse_list, inplace=True)
-
-    qconfig = torch.quantization.get_default_qconfig('fbgemm')
+    qconfig = get_default_qconfig('fbgemm')
     model.qconfig = qconfig
-    model = torch.quantization.prepare_qat(model)
-
+    torch.backends.quantized.engine = 'fbgemm'
+    model = prepare_qat(model)
     return model
 
 import torch.nn.functional as F
