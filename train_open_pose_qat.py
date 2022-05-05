@@ -25,7 +25,7 @@ def download_and_extract(url, download_path, extract_path):
 # URLs
 coco_images_url = "http://images.cocodataset.org/zips/train2017.zip"
 coco_annotations_url = "http://images.cocodataset.org/annotations/annotations_trainval2017.zip"
-pretrained_openpose_url = "YOUR_FOUND_OPENPOSE_MODEL_URL.pth"
+pretrained_openpose_url = "model.pth"
 
 # Paths
 download_path = "downloads"
@@ -92,7 +92,7 @@ for epoch in range(num_epochs):
     print(f"Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}")
 
 
-    
+
 
 # Convert to a quantized model
 quantized_model = convert(model, inplace=True)
