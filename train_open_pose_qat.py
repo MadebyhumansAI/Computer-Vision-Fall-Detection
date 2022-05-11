@@ -25,7 +25,7 @@ def download_and_extract(url, download_path, extract_path):
 # URLs
 coco_images_url = "http://images.cocodataset.org/zips/train2017.zip"
 coco_annotations_url = "http://images.cocodataset.org/annotations/annotations_trainval2017.zip"
-pretrained_openpose_url = "model.pth"
+pretrained_openpose_url = "http://images.cocodataset.org/zips/train2017.zip"
 
 # Paths
 download_path = "downloads"
