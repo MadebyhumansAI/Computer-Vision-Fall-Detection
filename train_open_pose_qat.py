@@ -8,6 +8,21 @@ import torchvision.transforms as transforms
 from torch.quantization import QuantStub, DeQuantStub, prepare, convert
 
 def download_and_extract(url, download_path, extract_path):
+
+    """
+    This function downloads the COCO dataset that is used by OpenPose.
+    Download the file at url, and extract it to extract_path
+
+    Args:
+    - url (str): URL to download the file from
+    - download_path (str): Path to download the file to
+    - extract_path (str): Path to extract the file to
+
+    Returns:
+    - None
+    
+    """
+
     if not os.path.exists(download_path):
         os.makedirs(download_path)
     if not os.path.exists(extract_path):
@@ -17,6 +32,8 @@ def download_and_extract(url, download_path, extract_path):
 
     # Downloading the file
     urllib.request.urlretrieve(url, file_name)
+
+    
 
     # Extracting the file
     with zipfile.ZipFile(file_name, 'r') as zip_ref:
@@ -36,6 +53,7 @@ pretrained_model_path = os.path.join(download_path, "openpose.pth")
 # Download datasets and model weights
 download_and_extract(coco_images_url, download_path, coco_path)
 download_and_extract(coco_annotations_url, download_path, coco_path)
+
 if not os.path.exists(pretrained_model_path):
     urllib.request.urlretrieve(pretrained_openpose_url, pretrained_model_path)
 
@@ -56,18 +74,51 @@ test_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=
 class OpenPoseModel(nn.Module):
     def __init__(self):
         super(OpenPoseModel, self).__init__()
-        # Placeholder for OpenPose architecture; adapt this!
-        self.model = nn.Sequential(
-            # ... layers of the OpenPose model ...
+
+        # Basic VGG-like backbone
+        self.vgg_backbone = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            # ... You'd continue this pattern for further VGG layers ...
         )
+
+        # Stages for keypoints and PAFs
+        # Here, I'm just providing a highly abstract representation with two stages
+        self.stage1 = nn.Sequential(
+            nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(inplace=True),
+            # This should ideally lead to heatmaps or PAFs
+            nn.Conv2d(128, 19, kernel_size=1, stride=1)  # For example, 19 keypoints
+        )
+        
+        self.stage2 = nn.Sequential(
+            nn.Conv2d(64+19, 128, kernel_size=7, stride=1, padding=3),  # Taking previous features and outputs into account
+            nn.ReLU(inplace=True),
+            # This should ideally lead to refined heatmaps or PAFs
+            nn.Conv2d(128, 19, kernel_size=1, stride=1)
+        )
+        
         self.quant = QuantStub()
         self.dequant = DeQuantStub()
 
     def forward(self, x):
         x = self.quant(x)
-        x = self.model(x)
+        
+        features = self.vgg_backbone(x)
+        stage1_out = self.stage1(features)
+        combined_features = torch.cat([features, stage1_out], 1)  # Assuming channel concatenation
+        stage2_out = self.stage2(combined_features)
+        
+        x = stage2_out  # In a real OpenPose model, you'd have more stages and also outputs for PAFs
+
         x = self.dequant(x)
         return x
+
 
 model = OpenPoseModel()
 model.load_state_dict(torch.load(pretrained_model_path))
@@ -90,9 +141,6 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
     print(f"Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}")
-
-
-
 
 # Convert to a quantized model
 quantized_model = convert(model, inplace=True)
