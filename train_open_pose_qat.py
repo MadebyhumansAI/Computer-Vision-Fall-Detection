@@ -6,6 +6,7 @@ import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
 from torch.quantization import QuantStub, DeQuantStub, prepare, convert
+from helpers import download_progress_hook
 
 def download_and_extract(url, download_path, extract_path):
 
@@ -31,9 +32,9 @@ def download_and_extract(url, download_path, extract_path):
     file_name = os.path.join(download_path, url.split('/')[-1])
 
     # Downloading the file
-    urllib.request.urlretrieve(url, file_name)
+    urllib.request.urlretrieve(url, file_name, reporthook=download_progress_hook)
 
-    
+
 
     # Extracting the file
     with zipfile.ZipFile(file_name, 'r') as zip_ref:
