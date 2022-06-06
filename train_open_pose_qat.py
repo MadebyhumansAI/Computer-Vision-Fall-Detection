@@ -12,7 +12,7 @@ def download_and_extract(url, download_path, extract_path):
 
     """
     This function downloads the COCO dataset that is used by OpenPose.
-    Download the file at url, and extract it to extract_path
+    Download the file at url, and extract it to extract_path.
 
     Args:
     - url (str): URL to download the file from

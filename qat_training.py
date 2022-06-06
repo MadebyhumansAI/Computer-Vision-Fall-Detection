@@ -8,8 +8,12 @@ import torchvision.transforms as transforms
 
 import torch
 from pathlib import Path
-
+import torch.optim as optim
+from yolov5.utils.loss import ComputeLoss  # Ultralytics specific YOLO loss
 from torch.quantization import get_default_qconfig, prepare_qat
+# import yolo5_hyper_parameters as hyp
+
+
 
 def load_yolo_model(model_name='yolov5s', pretrained=True):
     """Load a YOLOv5 model using Ultralytics implementation.
@@ -34,6 +38,7 @@ def load_yolo_model(model_name='yolov5s', pretrained=True):
     cache_dir = Path.home() / ".cache" / "torch" / "hub" / "checkpoints"
     cache_dir.mkdir(parents=True, exist_ok=True)
     model_file = cache_dir / f"{model_name}.pt"
+    print (model_file)
 
     if pretrained:
         if not model_file.exists():
@@ -60,8 +65,8 @@ def load_quantized_yolo_model(model_name='yolov5s', pretrained=True):
     model = load_yolo_model(model_name, pretrained)
     
     # Add quantization and dequantization stubs
-    model.quant = QuantStub()
-    model.dequant = DeQuantStub()
+    # model.quant = QuantStub()
+    # model.dequant = DeQuantStub()
 
     return model
 
@@ -128,20 +133,67 @@ def compute_yolo_loss(outputs, targets, anchors, num_classes, image_size=640):
 
     return loss
 
+hyp = {
+    'lr0': 0.01,  # initial learning rate (SGD=1E-2, Adam=1E-3)
+    'lrf': 0.2,  # final learning rate (SGD=0.004, Adam=0.0004)
+    'momentum': 0.937,  # SGD momentum/Adam beta1
+    'weight_decay': 0.0005,  # optimizer weight decay
+    'warmup_epochs': 3.0,  # warmup epochs (fractions ok)
+    'warmup_momentum': 0.8,  # warmup initial momentum
+    'warmup_bias_lr': 0.1,  # warmup initial bias lr
+    'box': 0.05,  # box loss gain
+    'cls': 0.5,   # cls loss gain
+    'cls_pw': 1.0,  # cls BCELoss positive_weight
+    'obj': 1.0,   # obj loss gain (scale with pixels)
+    'obj_pw': 1.0,  # obj BCELoss positive_weight
+    'iou_t': 0.20,  # IoU training threshold
+    'anchor_t': 4.0,  # anchor-multiple threshold
+    'anchors': 3,  # anchors per output grid (0 to ignore)
+    'fl_gamma': 0.0,  # focal loss gamma (efficientDet default gamma=1.5)
+    'hsv_h': 0.015,  # image HSV-Hue augmentation (fraction)
+    'hsv_s': 0.7,   # image HSV-Saturation augmentation (fraction)
+    'hsv_v': 0.4,   # image HSV-Value augmentation (fraction)
+    'degrees': 0.0,  # image rotation (+/- deg)
+    'translate': 0.1,  # image translation (+/- fraction)
+    'scale': 0.5,  # image scale (+/- gain)
+    'shear': 0.0,  # image shear (+/- deg)
+    'perspective': 0.0,  # image perspective (+/- fraction), range 0-0.001
+    'flipud': 0.0,  # image flip up-down (probability)
+    'fliplr': 0.5,  # image flip left-right (probability)
+    'mosaic': 1.0,  # image mosaic (probability)
+    'mixup': 0.0,  # image mixup (probability)
+}
 
-def train_qat(model, train_loader, num_epochs=5):
-    """Train the YOLOv5 model with Quantization-Aware Training."""
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+
+def train_qat(model, train_loader, num_epochs=5) -> torch.nn.Module:
+
+    """
+    Train a quantized YOLOv5 model.
+
+    Args:
+    - model (torch.nn.Module): The model to train.
+    - train_loader (torch.utils.data.DataLoader): Training data loader.
+    - num_epochs (int): Number of epochs to train for.
+
+    Returns:
+    - model (torch.nn.Module): Trained model.
     
+    """
+
+    # Define loss and optimizer
+    optimizer = optim.Adam(model.parameters(), lr=hyp['lr0'])
+
+    model.hyp = hyp  # Assign the hyperparameters to the model, to be used by ComputeLoss
+
+    criterion = ComputeLoss(model)  # Ultralytics specific YOLO loss
+
     for epoch in range(num_epochs):
         model.train()
-        for images, _ in train_loader:  # We're not using labels here for simplicity
+        for images, targets in train_loader:
             optimizer.zero_grad()
             outputs = model(images)
-            
-            # You should use the YOLOv5 loss function here
-            loss = compute_yolo_loss(outputs, targets)
-            
+            loss, loss_items = criterion(outputs, targets)  # Using Ultralytics loss function
             loss.backward()
             optimizer.step()
 
@@ -150,8 +202,9 @@ def train_qat(model, train_loader, num_epochs=5):
 
     return model
 
+
 if __name__ == "__main__":
-    model = load_quantized_yolo_model('yolov5s', pretrained=True)
+    model = load_quantized_yolo_model('yolov5s', pretrained=True) # take small model for faster training and inference
     model = prepare_for_qat(model)
 
     train_loader, _ = prepare_data()
