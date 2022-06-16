@@ -1,13 +1,46 @@
 import cv2
 import numpy as np
+import subprocess
+import json
 
 # Load pose estimation model (e.g., OpenPose)
 # For this example, this is a placeholder
 # In a real-world scenario, you'd use the OpenPose's API to get joint positions
-def get_joint_positions(image):
-    # Placeholder for joint position extraction
-    return {"joint_11": (x1, y1), "joint_12": (x2, y2)}
+# def get_joint_positions(image):
+#     # Placeholder for joint position extraction
+#     return {"joint_11": (x1, y1), "joint_12": (x2, y2)}
 
+
+
+def get_joint_positions(image_path):
+    # Define the path to the OpenPose binary
+    openpose_binary = "/path_to_openpose_directory/build/examples/openpose/openpose.bin"
+    
+    # Define output file name for joint positions
+    output_file = "output.json"
+
+    # Command to execute OpenPose. You may need to adjust the flags as per your needs.
+    cmd = [
+        openpose_binary,
+        "--image_dir", image_path,
+        "--write_json", output_file,
+        "--display", "0",
+        "--render_pose", "0"
+    ]
+    
+    subprocess.check_call(cmd)
+    
+    # Once the process completes, load the JSON output
+    with open(output_file, 'r') as f:
+        data = json.load(f)
+    
+    # Extracting joint positions from the output
+    keypoints = data[0]['people'][0]['pose_keypoints_2d']
+    
+    # Reshape to get (x, y, confidence) triplets
+    keypoints = np.array(keypoints).reshape((-1, 3))
+    
+    return keypoints
 
 
 def calculate_descent_velocity(yt2, yt1, t2, t1):
