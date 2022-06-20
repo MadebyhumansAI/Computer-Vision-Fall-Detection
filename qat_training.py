@@ -13,8 +13,6 @@ from yolov5.utils.loss import ComputeLoss  # Ultralytics specific YOLO loss
 from torch.quantization import get_default_qconfig, prepare_qat
 # import yolo5_hyper_parameters as hyp
 
-
-
 def load_yolo_model(model_name='yolov5s', pretrained=True):
     """Load a YOLOv5 model using Ultralytics implementation.
 
@@ -164,7 +162,15 @@ hyp = {
     'mixup': 0.0,  # image mixup (probability)
 }
 
+""
+class AutoShapeWithHyp(nn.Module):
+    def __init__(self, model, hyp):
+        super().__init__()
+        self.model = model
+        self.hyp = hyp
 
+    def forward(self, x):
+        return self.model(x)
 
 def train_qat(model, train_loader, num_epochs=5) -> torch.nn.Module:
 
@@ -184,7 +190,11 @@ def train_qat(model, train_loader, num_epochs=5) -> torch.nn.Module:
     # Define loss and optimizer
     optimizer = optim.Adam(model.parameters(), lr=hyp['lr0'])
 
-    model.hyp = hyp  # Assign the hyperparameters to the model, to be used by ComputeLoss
+    #model.hyp = hyp  # Assign the hyperparameters to the model, to be used by ComputeLoss
+    
+    # print(type(model))
+
+    #model = AutoShapeWrapper(model.hyp) # wrap the model with AutoShapeWrapper to enable automatic shape inference
 
     criterion = ComputeLoss(model)  # Ultralytics specific YOLO loss
 

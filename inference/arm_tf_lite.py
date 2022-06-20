@@ -11,6 +11,8 @@ def preprocess_image(image_path, input_size=(640, 640)):
     return image_array
 
 def postprocess_output(raw_output, score_threshold=0.3, iou_threshold=0.5):
+
+    
     """Post-process the raw output."""
     boxes = raw_output[..., :4]
     objectness = raw_output[..., 4:5]
@@ -68,7 +70,7 @@ def run_inference(tflite_model_path, image_path):
     boxes, scores, classes, valid_detections = postprocess_output(raw_output)
     return boxes, scores, classes, valid_detections
 
-# Example usage:
+# test plaatje
 image_path = "/home/luis/fall-detect/inference/person.jpg"
 tflite_model_path = "/home/luis/fall-detect/inference/yolo5s.tflite"
 boxes, scores, classes, valid_detections = run_inference(tflite_model_path, image_path)
