@@ -5,13 +5,16 @@ from torch.quantization import QuantStub, DeQuantStub, fuse_modules
 from torch.utils.data import DataLoader
 from torchvision.datasets import VOCDetection
 import torchvision.transforms as transforms
-
-import torch
 from pathlib import Path
 import torch.optim as optim
 from yolov5.utils.loss import ComputeLoss  # Ultralytics specific YOLO loss
 from torch.quantization import get_default_qconfig, prepare_qat
 # import yolo5_hyper_parameters as hyp
+import math
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
+import torch.optim.lr_scheduler as lr_scheduler
+import torch.nn.functional as F
 
 def load_yolo_model(model_name='yolov5s', pretrained=True):
     """Load a YOLOv5 model using Ultralytics implementation.
@@ -63,8 +66,8 @@ def load_quantized_yolo_model(model_name='yolov5s', pretrained=True):
     model = load_yolo_model(model_name, pretrained)
     
     # Add quantization and dequantization stubs
-    # model.quant = QuantStub()
-    # model.dequant = DeQuantStub()
+    model.quant = QuantStub()
+    model.dequant = DeQuantStub()
 
     return model
 
@@ -89,8 +92,6 @@ def prepare_for_qat(model):
     torch.backends.quantized.engine = 'fbgemm'
     model = prepare_qat(model)
     return model
-
-import torch.nn.functional as F
 
 def compute_yolo_loss(outputs, targets, anchors, num_classes, image_size=640):
     """
@@ -162,16 +163,6 @@ hyp = {
     'mixup': 0.0,  # image mixup (probability)
 }
 
-""
-class AutoShapeWithHyp(nn.Module):
-    def __init__(self, model, hyp):
-        super().__init__()
-        self.model = model
-        self.hyp = hyp
-
-    def forward(self, x):
-        return self.model(x)
-
 def train_qat(model, train_loader, num_epochs=5) -> torch.nn.Module:
 
     """
@@ -190,13 +181,7 @@ def train_qat(model, train_loader, num_epochs=5) -> torch.nn.Module:
     # Define loss and optimizer
     optimizer = optim.Adam(model.parameters(), lr=hyp['lr0'])
 
-    #model.hyp = hyp  # Assign the hyperparameters to the model, to be used by ComputeLoss
-    
-    # print(type(model))
-
-    #model = AutoShapeWrapper(model.hyp) # wrap the model with AutoShapeWrapper to enable automatic shape inference
-
-    criterion = ComputeLoss(model)  # Ultralytics specific YOLO loss
+    criterion = ComputeLoss(model, hyp)  # Ultralytics specific YOLO loss
 
     for epoch in range(num_epochs):
         model.train()
