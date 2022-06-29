@@ -3,18 +3,9 @@ import numpy as np
 import subprocess
 import json
 
-# Load pose estimation model (e.g., OpenPose)
-# For this example, this is a placeholder
-# In a real-world scenario, you'd use the OpenPose's API to get joint positions
-# def get_joint_positions(image):
-#     # Placeholder for joint position extraction
-#     return {"joint_11": (x1, y1), "joint_12": (x2, y2)}
-
-
-
 def get_joint_positions(image_path):
     # Define the path to the OpenPose binary
-    openpose_binary = "/path_to_openpose_directory/build/examples/openpose/openpose.bin"
+    openpose_binary = "/home/luis/openpose/build/openpose.bin"
     
     # Define output file name for joint positions
     output_file = "output.json"
@@ -71,12 +62,11 @@ def is_fall(v):
 
 def main():
     # Load your image
-    img = cv2.imread("path_to_your_image.jpg")
+    img = cv2.imread("/home/luis/Downloads/deaa7a7d-18c3-43ab-950e-57809defa36e.png")
 
     # Extract joint positions (specifically hip joints 11 and 12 for this example)
     joint_positions = get_joint_positions(img)
 
-    # For the sake of example, let's assume two consecutive images or frames
     yt1 = joint_positions["joint_11"][1]  # y-coordinate of joint 11
     yt2 = joint_positions["joint_12"][1]  # y-coordinate of joint 12
 
