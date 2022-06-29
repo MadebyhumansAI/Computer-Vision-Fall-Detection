@@ -24,7 +24,7 @@ def get_joint_positions(image_path):
     with open(output_file, 'r') as f:
         data = json.load(f)
     
-    # Extracting joint positions from the output
+    # Extracting joint positions from the output, test one person first
     keypoints = data[0]['people'][0]['pose_keypoints_2d']
     
     # Reshape to get (x, y, confidence) triplets
