@@ -4,13 +4,13 @@ import subprocess
 import json
 
 def get_joint_positions(image_path):
-    # Define the path to the OpenPose binary
+    # path to the OpenPose binary
     openpose_binary = "/home/luis/openpose/build/openpose.bin"
     
-    # Define output file name for joint positions
+    # output file name with joint positions
     output_file = "output.json"
 
-    # Command to execute OpenPose. You may need to adjust the flags as per your needs.
+    # execute OpenPose. 
     cmd = [
         openpose_binary,
         "--image_dir", image_path,
@@ -21,7 +21,6 @@ def get_joint_positions(image_path):
     
     subprocess.check_call(cmd)
     
-    # Once the process completes, load the JSON output
     with open(output_file, 'r') as f:
         data = json.load(f)
     
