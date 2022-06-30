@@ -5,7 +5,7 @@ import json
 
 def get_joint_positions(image_path):
     # path to the OpenPose binary
-    openpose_binary = "/home/luis/openpose/build/openpose.bin"
+    openpose_binary = "/home/ubuntu/openpose/build/openpose.bin"
     
     # output file name with joint positions
     output_file = "output.json"
@@ -61,7 +61,7 @@ def is_fall(v):
 
 def main():
     # Load your image
-    img = cv2.imread("/home/luis/Downloads/deaa7a7d-18c3-43ab-950e-57809defa36e.png")
+    img = cv2.imread("/home/ubuntu/deaa7a7d-18c3-43ab-950e-57809defa36e.png")
 
     # Extract joint positions (specifically hip joints 11 and 12 for this example)
     joint_positions = get_joint_positions(img)
