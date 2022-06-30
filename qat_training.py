@@ -184,7 +184,7 @@ def train_qat(model, train_loader, num_epochs=5) -> torch.nn.Module:
 # model.parameters() - Retrieves the parameters (weights & biases) of the given model.
 # lr=hyp['lr0']       - The learning rate which determines the step size at each iteration 
 #                       while moving toward a minimum of the loss function. It's one of the hyperparameters 
-#                       we can tune, and in this case, it's fetched from a dictionary named 'hyp'.
+#                      we can tune, and in this case, it's fetched from a dictionary named 'hyp'.
     optimizer = optim.Adam(model.parameters(), lr=hyp['lr0'])
 
     criterion = ComputeLoss(model, hyp)  # Ultralytics specific YOLO loss
