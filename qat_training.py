@@ -73,6 +73,7 @@ def load_quantized_yolo_model(model_name='yolov5s', pretrained=True):
 
 def prepare_data():
     """Load and prepare the VOC dataset."""
+
     transform = transforms.Compose([
         transforms.Resize((640, 640)),  # YOLOv5 uses 640 as a default size
         transforms.ToTensor(),
@@ -179,6 +180,11 @@ def train_qat(model, train_loader, num_epochs=5) -> torch.nn.Module:
     """
 
     # Define loss and optimizer
+    # Parameters:
+# model.parameters() - Retrieves the parameters (weights & biases) of the given model.
+# lr=hyp['lr0']       - The learning rate which determines the step size at each iteration 
+#                       while moving toward a minimum of the loss function. It's one of the hyperparameters 
+#                       we can tune, and in this case, it's fetched from a dictionary named 'hyp'.
     optimizer = optim.Adam(model.parameters(), lr=hyp['lr0'])
 
     criterion = ComputeLoss(model, hyp)  # Ultralytics specific YOLO loss
