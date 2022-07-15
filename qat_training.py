@@ -11,9 +11,12 @@ from yolov5.utils.loss import ComputeLoss  # Ultralytics specific YOLO loss
 from torch.quantization import get_default_qconfig, prepare_qat
 # import yolo5_hyper_parameters as hyp
 import math
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
+import torch.optim.lr_scheduler as lr_scheduler
+import torch.nn.functional as F
 
-
-def load_yolo_model(model_name='yolov5s', pretrained=True):
+def load_yolo_model(model_name='yolov5s'):
     """Load a YOLOv5 model using Ultralytics implementation.
 
     Args:
