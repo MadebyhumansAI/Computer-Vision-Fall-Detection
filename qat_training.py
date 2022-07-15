@@ -16,7 +16,7 @@ from albumentations.pytorch import ToTensorV2
 import torch.optim.lr_scheduler as lr_scheduler
 import torch.nn.functional as F
 
-def load_yolo_model(model_name='yolov5s'):
+def load_yolo_model(model_name='yolov5s', pretrained=True):
     """Load a YOLOv5 model using Ultralytics implementation.
 
     Args:
