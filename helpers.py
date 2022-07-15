@@ -3,8 +3,13 @@ import sys
 import time
 
 def download_progress_hook(count, block_size, total_size):
+
     """
     A hook to report the progress of a download. Displays a progress bar.
+    :param count: count of blocks downloaded so far
+    :param block_size: size of each block
+    :param total_size: total size of the file
+    :return: None
     """
     global start_time
 
