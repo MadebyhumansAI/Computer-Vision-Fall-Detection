@@ -50,8 +50,14 @@ coco_path = os.path.join(extract_path, "coco")
 pretrained_model_path = os.path.join(download_path, "openpose.pth")
 
 # Download datasets and model weights
+
+"""
+Download the COCO dataset that is used by OpenPose
+"""
+
 download_and_extract(coco_images_url, download_path, coco_path)
 download_and_extract(coco_annotations_url, download_path, coco_path)
+
 
 if not os.path.exists(pretrained_model_path):
     urllib.request.urlretrieve(pretrained_openpose_url, pretrained_model_path)
