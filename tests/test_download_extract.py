@@ -1,5 +1,6 @@
 import unittest
 from train_open_pose_qat import download_and_extract
+import os
 
 class TestDownloadAndExtract(unittest.TestCase):
     def test_download_and_extract(self):
