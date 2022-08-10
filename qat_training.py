@@ -39,7 +39,7 @@ def load_yolo_model(model_name='yolov5s', pretrained=True):
     cache_dir = Path.home() / ".cache" / "torch" / "hub" / "checkpoints"
     cache_dir.mkdir(parents=True, exist_ok=True)
     model_file = cache_dir / f"{model_name}.pt"
-    print (model_file)
+
 
     if pretrained:
         if not model_file.exists():
