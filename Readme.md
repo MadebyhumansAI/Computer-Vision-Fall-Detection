@@ -57,7 +57,3 @@ These functions can be invaluable for applications related to elder care or surv
 
 **Conclusion**  
 Quantized Aware Training coupled with pruning offers a compelling solution for deploying efficient deep learning models on edge devices. Whether targeting Intel or ARM architectures, the modern ecosystem provides tools and libraries that simplify the deployment process of such optimized models.
-
----
-
-You can copy the content above and use it as needed.
