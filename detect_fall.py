@@ -18,8 +18,11 @@ def get_joint_positions(image_path):
         "--display", "0",
         "--render_pose", "0"
     ]
-    
-    subprocess.check_call(cmd)
+
+    try:
+        subprocess.check_call(cmd)
+    except subprocess.CalledProcessError as e:
+        print(f"Error running command: {e}")
     
     with open(output_file, 'r') as f:
         data = json.load(f)
