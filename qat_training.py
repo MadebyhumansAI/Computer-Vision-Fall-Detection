@@ -66,8 +66,8 @@ def load_quantized_yolo_model(model_name='yolov5s', pretrained=True):
     model = load_yolo_model(model_name, pretrained)
     
     # Add quantization and dequantization stubs
-    model.quant = QuantStub()
-    model.dequant = DeQuantStub()
+    model.quant = QuantStub() # emulate quantizing int8
+    model.dequant = DeQuantStub() # emulate dequantizing float32
 
     return model
 
