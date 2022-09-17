@@ -202,15 +202,19 @@ def train_qat(model, train_loader, num_epochs=5) -> torch.nn.Module:
     # Convert the model to use quantized operations
     model = torch.quantization.convert(model.eval(), inplace=False)
 
+
     return model
 
 
 if __name__ == "__main__":
-    model = load_quantized_yolo_model('yolov5s', pretrained=True) # take small model for faster training and inference
+    model = load_quantized_yolo_model('yolov5s', pretrained=True)  # take small model for faster training and inference
     model = prepare_for_qat(model)
 
     train_loader, _ = prepare_data()
     
     trained_model = train_qat(model, train_loader, num_epochs=5)
+    
+    # Save the trained model's checkpoint
+    torch.save(trained_model.state_dict(), 'trained_model_checkpoint.pth')
 
 
