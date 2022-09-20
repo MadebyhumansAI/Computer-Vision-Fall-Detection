@@ -87,11 +87,22 @@ def prepare_data():
     
     return train_loader, test_loader
 
-def prepare_for_qat(model):
-    qconfig = get_default_qconfig('fbgemm')
-    model.qconfig = qconfig
-    torch.backends.quantized.engine = 'fbgemm'
-    model = prepare_qat(model)
+def prepare_for_qat(model)->torch.nn.Module:
+    """
+    Prepare a YOLOv5 model for quantization aware training.
+    
+    Args:
+    - model (torch.nn.Module): The model to prepare for quantization aware training.
+
+    Returns:
+    - model (torch.nn.Module): The model prepared for quantization aware training.
+
+    """
+    
+    qconfig = get_default_qconfig('fbgemm') #get config for 8-bit quantization kernel
+    model.qconfig = qconfig #set the qconfig for the model
+    torch.backends.quantized.engine = 'fbgemm' #set the backend engine for quantization to fb-gemm, you can choose from qnnpack or fb-gemm
+    model = prepare_qat(model) # pass to torch library for preparing the model for quantization aware training
     return model
 
 def compute_yolo_loss(outputs, targets, anchors, num_classes, image_size=640):
