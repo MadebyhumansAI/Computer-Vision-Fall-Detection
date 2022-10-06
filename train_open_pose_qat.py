@@ -47,7 +47,7 @@ pretrained_openpose_url = "http://images.cocodataset.org/zips/train2017.zip"
 download_path = "downloads"
 extract_path = "datasets"
 coco_path = os.path.join(extract_path, "coco")
-pretrained_model_path = os.path.join(download_path, "openpose.pth")
+pretrained_model_path = os.path.join(download_path, "openpose.pth") 
 
 # Download datasets and model weights
 
