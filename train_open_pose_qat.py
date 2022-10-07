@@ -125,30 +125,4 @@ class OpenPoseModel(nn.Module):
         return x
 
 
-model = OpenPoseModel()
-model.load_state_dict(torch.load(pretrained_model_path))
-model.qconfig = torch.quantization.get_default_qconfig('fbgemm')  # Use 'qnnpack' for ARM architectures
 
-# Prepare the model for QAT
-model = prepare(model, inplace=True)
-
-# Define loss and optimizer
-criterion = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-
-# Train with QAT
-num_epochs = 5
-for epoch in range(num_epochs):
-    for i, (inputs, labels) in enumerate(train_loader):
-        optimizer.zero_grad()
-        outputs = model(inputs)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
-    print(f"Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}")
-
-# Convert to a quantized model
-quantized_model = convert(model, inplace=True)
-
-# Saving quantized model
-torch.save(quantized_model.state_dict(), "quantized_openpose.pth")
