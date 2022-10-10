@@ -57,8 +57,9 @@ def is_fall(v):
     This function checks if the person's descent velocity is greater than the critical speed
     :param v: velocity of the person's descent
     :return: True if the person's descent velocity is greater than the critical speed, False otherwise
+    https://www.mdpi.com/2073-8994/12/5/744/htm
     """
-    critical_speed = 0.009  # m/s
+    critical_speed = 0.009  # m/s According to the experimental results, this paper chooses 0.009 m/s as the threshold of the falling speedof the hip joint center.
     return v >= critical_speed
 
 
