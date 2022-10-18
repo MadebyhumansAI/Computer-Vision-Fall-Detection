@@ -8,10 +8,8 @@ import torchvision.transforms as transforms
 from torch.quantization import QuantStub, DeQuantStub, prepare, convert
 from helpers import download_progress_hook
 
-def download_and_extract(url, download_path, extract_path) -> None:
-
+def download_and_extract(url, download_path, extract_path):
     """
-    This function downloads the COCO dataset that is used by OpenPose.
     Download the file at url, and extract it to extract_path.
 
     Args:
@@ -21,15 +19,11 @@ def download_and_extract(url, download_path, extract_path) -> None:
 
     Returns:
     - None
-    
     """
+    os.makedirs(download_path, exist_ok=True)
+    os.makedirs(extract_path, exist_ok=True)
 
-    if not os.path.exists(download_path):
-        os.makedirs(download_path)
-    if not os.path.exists(extract_path):
-        os.makedirs(extract_path)
-
-    file_name = os.path.join(download_path, url.split('/')[-1])
+    file_name = os.path.join(download_path, os.path.basename(url))
 
     # Downloading the file
     urllib.request.urlretrieve(url, file_name, reporthook=download_progress_hook)
