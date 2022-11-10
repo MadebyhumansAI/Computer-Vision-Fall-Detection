@@ -32,5 +32,3 @@ train_loader, test_loader = get_coco_dataloaders(coco_path, transform)
 model = OpenPoseModel()
 model.load_state_dict(torch.load(pretrained_model_path))
 model.qconfig = torch.quantization.get_default_qconfig('fbgemm')
-
-# ... [Rest of the model training and saving code]
