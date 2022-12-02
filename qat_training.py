@@ -15,6 +15,7 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 import torch.optim.lr_scheduler as lr_scheduler
 import torch.nn.functional as F
+from helpers import get_yolo_hyperparameters
 
 def load_yolo_model(model_name='yolov5s', pretrained=True):
     """Load a YOLOv5 model using Ultralytics implementation.
@@ -144,37 +145,6 @@ def compute_yolo_loss(outputs, targets, anchors, num_classes, image_size=640):
 
     return loss
 
-hyp = {
-    'lr0': 0.01,  # initial learning rate (SGD=1E-2, Adam=1E-3)
-    'lrf': 0.2,  # final learning rate (SGD=0.004, Adam=0.0004)
-    'momentum': 0.937,  # SGD momentum/Adam beta1
-    'weight_decay': 0.0005,  # optimizer weight decay
-    'warmup_epochs': 3.0,  # warmup epochs (fractions ok)
-    'warmup_momentum': 0.8,  # warmup initial momentum
-    'warmup_bias_lr': 0.1,  # warmup initial bias lr
-    'box': 0.05,  # box loss gain
-    'cls': 0.5,   # cls loss gain
-    'cls_pw': 1.0,  # cls BCELoss positive_weight
-    'obj': 1.0,   # obj loss gain (scale with pixels)
-    'obj_pw': 1.0,  # obj BCELoss positive_weight
-    'iou_t': 0.20,  # IoU training threshold
-    'anchor_t': 4.0,  # anchor-multiple threshold
-    'anchors': 3,  # anchors per output grid (0 to ignore)
-    'fl_gamma': 0.0,  # focal loss gamma (efficientDet default gamma=1.5)
-    'hsv_h': 0.015,  # image HSV-Hue augmentation (fraction)
-    'hsv_s': 0.7,   # image HSV-Saturation augmentation (fraction)
-    'hsv_v': 0.4,   # image HSV-Value augmentation (fraction)
-    'degrees': 0.0,  # image rotation (+/- deg)
-    'translate': 0.1,  # image translation (+/- fraction)
-    'scale': 0.5,  # image scale (+/- gain)
-    'shear': 0.0,  # image shear (+/- deg)
-    'perspective': 0.0,  # image perspective (+/- fraction), range 0-0.001
-    'flipud': 0.0,  # image flip up-down (probability)
-    'fliplr': 0.5,  # image flip left-right (probability)
-    'mosaic': 1.0,  # image mosaic (probability)
-    'mixup': 0.0,  # image mixup (probability)
-}
-
 def train_qat(model, train_loader, num_epochs=5) -> torch.nn.Module:
 
     """
@@ -196,6 +166,8 @@ def train_qat(model, train_loader, num_epochs=5) -> torch.nn.Module:
     # lr=hyp['lr0']       - The learning rate which determines the step size at each iteration 
     #                       while moving toward a minimum of the loss function. It's one of the hyperparameters 
     #                      we can tune, and in this case, it's fetched from a dictionary named 'hyp'.
+
+    hyp = get_yolo_hyperparameters()
     
     optimizer = optim.Adam(model.parameters(), lr=hyp['lr0'])
 
