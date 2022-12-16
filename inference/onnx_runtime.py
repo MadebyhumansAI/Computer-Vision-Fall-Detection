@@ -50,7 +50,7 @@ def run_onnx_inference(session, image):
 
 if __name__ == '__main__':
     # Define input and model paths
-    input_path = "input.jpg"
+    input_path = "/home/ubuntu/fall-detect/inference/person.jpg"
     model_path = "converters/model.onnx"
 
     # Load the ONNX model

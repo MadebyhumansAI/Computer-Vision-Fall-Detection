@@ -22,13 +22,6 @@ def preprocess_image(image_path, input_size=(640, 640)):
     - FileNotFoundError: If the image file at image_path does not exist.
     - ValueError: If the input_size argument is not a tuple of two integers.
 
-    This function opens the image file at image_path using the Image.open function from the PIL library.
-    It then resizes the image to the specified input size using the resize method of the Image object.
-    The resized image is then converted to a NumPy array using the np.array function, with the dtype argument
-    set to np.uint8 to ensure that the array has the correct data type.
-    Finally, the function expands the dimensions of the image array along the first axis using the np.expand_dims
-    function, with the axis argument set to 0. This is because the YOLOv5 model expects a batch of images as input,
-    even if there is only one image in the batch.
     """
 
     image = Image.open(image_path)
@@ -133,8 +126,8 @@ def run_inference(tflite_model_path, image_path):
     return boxes, scores, classes, valid_detections
 
 # test plaatje
-image_path = "/home/luis/fall-detect/inference/person.jpg"
-tflite_model_path = "/home/luis/fall-detect/inference/yolo5s.tflite"
+image_path = "/home/ubuntu/fall-detect/inference/person.jpg"
+tflite_model_path = "/home/ubuntu/fall-detect/inference/yolo5s.tflite"
 boxes, scores, classes, valid_detections = run_inference(tflite_model_path, image_path)
 
 print(f"Boxes: {boxes}")
