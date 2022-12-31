@@ -60,13 +60,6 @@ def postprocess_output(raw_output, score_threshold=0.3, iou_threshold=0.5):
                                The array has shape (batch_size, max_detections).
     - valid_detections (numpy.ndarray): A NumPy array representing the number of valid detections per image.
                                          The array has shape (batch_size,).
-
-    This function performs non-max suppression on the raw output of a TensorFlow Lite object detection model.
-    It first extracts the box coordinates, objectness scores, and class probabilities from the raw output.
-    It then computes the scores of the detected objects as the product of the objectness scores and class probabilities.
-    It applies non-max suppression to the scores and box coordinates using the combined_non_max_suppression function
-    from the TensorFlow image module. The function returns the bounding boxes, scores, classes, and valid detections
-    of the detected objects.
     """
     
     boxes = raw_output[..., :4]

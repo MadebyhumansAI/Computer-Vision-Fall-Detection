@@ -64,10 +64,10 @@ def is_fall(v):
 
 
 def main():
-    # Load your image
+    
     img = cv2.imread("/home/ubuntu/deaa7a7d-18c3-43ab-950e-57809defa36e.png")
 
-    # Extract joint positions (specifically hip joints 11 and 12 for this example)
+    # Extract joint positions (specifically hip joints 11 and 12 for this test)
     joint_positions = get_joint_positions(img)
 
     yt1 = joint_positions["joint_11"][1]  # y-coordinate of joint 11
